@@ -7,15 +7,19 @@ use Illuminate\Support\Facades\Auth;
 
 class UserInfoController extends Controller
 {
+    // Show the form for collecting additional information
     public function showForm()
     {
-        if (Auth::user()->is_info_provided) {
+        $user = Auth::user();
+
+        if ($user->is_info_provided) {
             return redirect()->route('dashboard');
         }
 
         return view('user-info');
     }
 
+    // Handle the submission of the user info form
     public function submitForm(Request $request)
     {
         $request->validate([
@@ -35,6 +39,6 @@ class UserInfoController extends Controller
 
         $user->update(['is_info_provided' => true]);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('dashboard'); 
     }
 }
