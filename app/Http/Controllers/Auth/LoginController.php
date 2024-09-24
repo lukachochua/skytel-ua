@@ -29,7 +29,6 @@ class LoginController extends Controller
     {
         try {
             $googleUser = Socialite::driver('google')->stateless()->user();
-
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if ($user) {
@@ -40,13 +39,17 @@ class LoginController extends Controller
                     'email' => $googleUser->getEmail(),
                     'google_id' => $googleUser->getId(),
                     'avatar' => $googleUser->getAvatar(),
-                    'password' => bcrypt('google_oauth_password') 
+                    'password' => bcrypt('google_oauth_password'),
+                    'is_info_provided' => false
                 ]);
-
                 Auth::login($newUser);
             }
 
-            return redirect()->intended('dashboard'); 
+            if (Auth::user()->is_info_provided) {
+                return redirect()->route('dashboard');
+            } else {
+                return redirect()->route('user.info.form'); 
+            }
         } catch (Exception $e) {
             return redirect('login')->with('error', 'Unable to login using Google. Please try again.');
         }
