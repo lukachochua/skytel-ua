@@ -8,7 +8,7 @@ use App\Http\Controllers\UserInfoController;
 
 // Login routes
 Route::get('/', function () {
-    return view('auth.login');
+    return Auth::check() ? redirect()->route('dashboard') : view('auth.login');
 })->name('login');
 
 // Google authentication routes
@@ -20,16 +20,16 @@ Route::get('/dashboard', function () {
     $user = Auth::user();
 
     if (!$user->is_info_provided) {
-        return redirect()->route('user.info.form'); 
+        return redirect()->route('user.info.form');
     }
 
-    return view('dashboard'); 
+    return view('dashboard');
 })->middleware('auth')->name('dashboard');
 
 // Logout route
 Route::post('/logout', function () {
     Auth::logout();
-    return redirect('/login');
+    return redirect()->route('login');
 })->name('logout');
 
 // User info form route
