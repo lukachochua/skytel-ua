@@ -1,5 +1,3 @@
-<!-- File: resources/views/user/additional_info.blade.php -->
-
 @extends('layouts.app')
 
 @section('content')
@@ -45,30 +43,3 @@
     </div>
 @endsection
 
-@push('styles')
-    <style>
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .card-header {
-            background-color: #f8f9fa;
-            border-bottom: none;
-            padding: 1.5rem;
-        }
-
-        .card-body {
-            padding: 2rem;
-        }
-
-        .form-label {
-            font-weight: 500;
-        }
-
-        .btn-primary {
-            padding: 0.5rem 2rem;
-        }
-    </style>
-@endpush

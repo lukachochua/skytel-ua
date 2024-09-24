@@ -1,5 +1,3 @@
-<!-- File: resources/views/auth/login.blade.php -->
-
 @extends('layouts.app')
 
 @section('content')
@@ -11,10 +9,10 @@
                         <h2 class="card-title text-center mb-4">Login</h2>
 
                         <!-- Google Login Button -->
-                        <a href="{{ route('google.login') }}" class="btn btn-danger btn-block mb-3">
+                        <a href="{{ route('google.login') }}"
+                            class="btn btn-danger w-50 d-flex align-items-center justify-content-center mb-3">
                             <i class="fab fa-google me-2"></i> Login with Google
                         </a>
-
                         <div class="text-center mb-3">
                             <span class="text-muted">or</span>
                         </div>
@@ -63,41 +61,3 @@
         </div>
     </div>
 @endsection
-
-@push('styles')
-    <style>
-        .login-card {
-            margin-top: 2rem;
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            transition: none !important;
-            transform: none !important;
-        }
-
-        .login-card:hover {
-            transform: none !important;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
-        }
-
-        .card-title {
-            color: #333;
-            font-weight: 300;
-        }
-
-        .btn-block {
-            display: block;
-            width: 100%;
-        }
-
-        .btn-danger {
-            background-color: #db4437;
-            border-color: #db4437;
-        }
-
-        .btn-danger:hover {
-            background-color: #c23321;
-            border-color: #c23321;
-        }
-    </style>
-@endpush
