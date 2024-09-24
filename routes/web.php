@@ -6,12 +6,8 @@ use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserInfoController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 // Login routes
-Route::get('/login', function () {
+Route::get('/', function () {
     return view('auth.login');
 })->name('login');
 
@@ -29,7 +25,6 @@ Route::get('/dashboard', function () {
 
     return view('dashboard'); 
 })->middleware('auth')->name('dashboard');
-
 
 // Logout route
 Route::post('/logout', function () {
