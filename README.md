@@ -1,4 +1,4 @@
-# Project Name
+# SkyTel USER AREA
 
 ## Description
 This project implements a user authentication system with various features, including password reset functionality, social media authentication, and user profile management. It is built with Laravel and utilizes Bootstrap for styling.
