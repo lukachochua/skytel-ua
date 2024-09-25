@@ -8,16 +8,20 @@
                     <div class="card-body">
                         <h2 class="card-title text-center mb-4">Login</h2>
 
-                        <!-- Google Login Button -->
-                        <a href="{{ route('google.login') }}"
-                            class="btn btn-danger w-50 d-flex align-items-center justify-content-center mb-3">
-                            <i class="fab fa-google me-2"></i> Login with Google
-                        </a>
+                        <div class="d-flex justify-content-between mb-3"> <!-- Flex container -->
+                            <!-- Google Login Button -->
+                            <a href="{{ route('google.login') }}"
+                                class="btn btn-danger w-100 d-flex align-items-center justify-content-center me-2">
+                                <i class="fab fa-google me-2"></i> Login with Google
+                            </a>
 
-                        <a href="{{ route('facebook.login') }}"
-                            class="btn btn-primary w-50 d-flex align-items-center justify-content-center mb-3">
-                            <i class="fab fa-facebook me-2"></i> Login with Facebook
-                        </a>
+                            <!-- Facebook Login Button -->
+                            <a href="{{ route('facebook.login') }}"
+                                class="btn btn-primary w-100 d-flex align-items-center justify-content-center">
+                                <i class="fab fa-facebook me-2"></i> Login with Facebook
+                            </a>
+                        </div>
+
                         <div class="text-center mb-3">
                             <span class="text-muted">or</span>
                         </div>

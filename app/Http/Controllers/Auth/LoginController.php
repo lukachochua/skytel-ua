@@ -58,7 +58,7 @@ class LoginController extends Controller
     public function redirectToFacebook()
     {
         return Socialite::driver('facebook')
-            ->scopes(['email']) 
+            ->scopes(['email', 'public_profile', 'user_photos']) 
             ->stateless()
             ->redirect();
     }
@@ -89,7 +89,7 @@ class LoginController extends Controller
                 return redirect()->route('user.info.form');
             }
         } catch (Exception $e) {
-            return redirect('login')->with('error', 'Unable to login using Facebook. Please try again.');
+            return redirect('/')->with('error', 'Unable to login using Facebook. Please try again.');
         }
     }
 }
