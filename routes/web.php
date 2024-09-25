@@ -24,7 +24,21 @@ Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallbac
 Route::get('auth/facebook', [LoginController::class, 'redirectToFacebook'])->name('facebook.login');
 Route::get('auth/facebook/callback', [LoginController::class, 'handleFacebookCallback']);
 
+// Logout route
+Route::post('/logout', function () {
+    Auth::logout();
+    return redirect()->route('login');
+})->name('logout');
 
+// Register routes
+Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('register', [RegisterController::class, 'register']);
+
+// Password Reset routes
+Route::get('password/reset', [LoginController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('password/email', [LoginController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('password/reset/{token}', [LoginController::class, 'showResetForm'])->name('password.reset');
+Route::post('password/reset', [LoginController::class, 'reset'])->name('password.update');
 
 // Dashboard route
 Route::get('/dashboard', function () {
@@ -43,15 +57,6 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
 });
 
-// Logout route
-Route::post('/logout', function () {
-    Auth::logout();
-    return redirect()->route('login');
-})->name('logout');
-
-// Register routes
-Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('register', [RegisterController::class, 'register']);
 
 // User info form route
 Route::get('/user-info', [UserInfoController::class, 'showForm'])

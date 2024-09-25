@@ -8,6 +8,8 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
@@ -32,6 +34,7 @@ class LoginController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
     public function redirectToGoogle()
     {
         return Socialite::driver('google')->redirect();
@@ -42,6 +45,7 @@ class LoginController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
     public function handleGoogleCallback()
     {
         try {
@@ -71,6 +75,9 @@ class LoginController extends Controller
             return redirect('login')->with('error', 'Unable to login using Google. Please try again.');
         }
     }
+
+
+    // Facebook Methods
 
     public function redirectToFacebook()
     {
@@ -108,5 +115,53 @@ class LoginController extends Controller
         } catch (Exception $e) {
             return redirect('/')->with('error', 'Unable to login using Facebook. Please try again.');
         }
+    }
+
+    // Password Reset Methods
+
+    public function showLinkRequestForm()
+    {
+        return view('auth.passwords.email');  
+    }
+
+
+    public function sendResetLinkEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $status = Password::sendResetLink($request->only('email'));
+
+        return $status === Password::RESET_LINK_SENT
+            ? back()->with(['status' => __($status)])
+            : back()->withErrors(['email' => __($status)]);
+    }
+
+
+    public function showResetForm(Request $request, $token = null)
+    {
+        return view('auth.passwords.reset')->with(
+            ['token' => $token, 'email' => $request->email]
+        );
+    }
+
+    public function reset(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:8',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->password = Hash::make($password);
+                $user->save();
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+            ? redirect()->route('login')->with('status', __($status))
+            : back()->withErrors(['email' => [__($status)]]);
     }
 }

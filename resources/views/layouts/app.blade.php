@@ -27,7 +27,6 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto align-items-center">
-                    <!-- align-items-center ensures vertical centering -->
                     @guest
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('login') }}">Login</a>
