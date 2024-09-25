@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\ProfileController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserInfoController;
 
@@ -19,6 +20,8 @@ Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallbac
 Route::get('auth/facebook', [LoginController::class, 'redirectToFacebook'])->name('facebook.login');
 Route::get('auth/facebook/callback', [LoginController::class, 'handleFacebookCallback']);
 
+
+
 // Dashboard route
 Route::get('/dashboard', function () {
     $user = Auth::user();
@@ -29,6 +32,12 @@ Route::get('/dashboard', function () {
 
     return view('dashboard');
 })->middleware('auth')->name('dashboard');
+
+// User Profile Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'showProfile'])->name('profile');
+    Route::put('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
+});
 
 // Logout route
 Route::post('/logout', function () {
