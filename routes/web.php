@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ProfileController;
+use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserInfoController;
 
@@ -44,6 +45,10 @@ Route::post('/logout', function () {
     Auth::logout();
     return redirect()->route('login');
 })->name('logout');
+
+// Register routes
+Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('register', [RegisterController::class, 'register']);
 
 // User info form route
 Route::get('/user-info', [UserInfoController::class, 'showForm'])
