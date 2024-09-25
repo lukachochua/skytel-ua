@@ -14,6 +14,10 @@ body {
     padding: 0.5rem 1rem;
 }
 
+.navbar .container {
+    max-width: 1200px; /* Adjust to your preferred fixed width */
+}
+
 .navbar-brand {
     color: #ffffff !important;
     font-weight: bold;
@@ -56,6 +60,15 @@ body {
 .dropdown-item:hover {
     background-color: #f8f9fa;
     color: #3498db;
+}
+
+/* Logout button */
+.logout-link {
+    color: #e74c3c;
+}
+
+.logout-link:hover {
+    background-color: #e74c3c;
 }
 
 /* Logout button */

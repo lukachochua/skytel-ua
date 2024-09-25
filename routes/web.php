@@ -15,6 +15,10 @@ Route::get('/', function () {
 Route::get('auth/google', [LoginController::class, 'redirectToGoogle'])->name('google.login');
 Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback']);
 
+// Facebook authentication routes
+Route::get('auth/facebook', [LoginController::class, 'redirectToFacebook'])->name('facebook.login');
+Route::get('auth/facebook/callback', [LoginController::class, 'handleFacebookCallback']);
+
 // Dashboard route
 Route::get('/dashboard', function () {
     $user = Auth::user();

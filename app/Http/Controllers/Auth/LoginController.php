@@ -48,10 +48,48 @@ class LoginController extends Controller
             if (Auth::user()->is_info_provided) {
                 return redirect()->route('dashboard');
             } else {
-                return redirect()->route('user.info.form'); 
+                return redirect()->route('user.info.form');
             }
         } catch (Exception $e) {
             return redirect('login')->with('error', 'Unable to login using Google. Please try again.');
+        }
+    }
+
+    public function redirectToFacebook()
+    {
+        return Socialite::driver('facebook')
+            ->scopes(['email']) 
+            ->stateless()
+            ->redirect();
+    }
+
+    public function handleFacebookCallback()
+    {
+        try {
+            $facebookUser = Socialite::driver('facebook')->stateless()->user();
+            $user = User::where('email', $facebookUser->getEmail())->first();
+
+            if ($user) {
+                Auth::login($user);
+            } else {
+                $newUser = User::create([
+                    'name' => $facebookUser->getName(),
+                    'email' => $facebookUser->getEmail(),
+                    'facebook_id' => $facebookUser->getId(),
+                    'avatar' => $facebookUser->getAvatar(),
+                    'password' => bcrypt('facebook_oauth_password'),
+                    'is_info_provided' => false
+                ]);
+                Auth::login($newUser);
+            }
+
+            if (Auth::user()->is_info_provided) {
+                return redirect()->route('dashboard');
+            } else {
+                return redirect()->route('user.info.form');
+            }
+        } catch (Exception $e) {
+            return redirect('login')->with('error', 'Unable to login using Facebook. Please try again.');
         }
     }
 }

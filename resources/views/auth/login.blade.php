@@ -13,6 +13,11 @@
                             class="btn btn-danger w-50 d-flex align-items-center justify-content-center mb-3">
                             <i class="fab fa-google me-2"></i> Login with Google
                         </a>
+
+                        <a href="{{ route('facebook.login') }}"
+                            class="btn btn-primary w-50 d-flex align-items-center justify-content-center mb-3">
+                            <i class="fab fa-facebook me-2"></i> Login with Facebook
+                        </a>
                         <div class="text-center mb-3">
                             <span class="text-muted">or</span>
                         </div>
