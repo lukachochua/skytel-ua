@@ -13,6 +13,9 @@ Route::get('/', function () {
     return Auth::check() ? redirect()->route('dashboard') : view('auth.login');
 })->name('login');
 
+Route::post('/', [LoginController::class, 'login'])->name('login.submit');
+
+
 // Google authentication routes
 Route::get('auth/google', [LoginController::class, 'redirectToGoogle'])->name('google.login');
 Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback']);

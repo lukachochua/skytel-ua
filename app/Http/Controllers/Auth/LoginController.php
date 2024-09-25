@@ -7,9 +7,26 @@ use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Exception;
+use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
+
+
+    public function login(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::attempt($credentials)) {
+            return redirect()->route('dashboard');
+        }
+
+        return redirect()->route('login')->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ]);
+    }
+
+
     /**
      * Redirect the user to the Google authentication page.
      *
@@ -58,7 +75,7 @@ class LoginController extends Controller
     public function redirectToFacebook()
     {
         return Socialite::driver('facebook')
-            ->scopes(['email', 'public_profile', 'user_photos']) 
+            ->scopes(['email', 'public_profile', 'user_photos'])
             ->stateless()
             ->redirect();
     }

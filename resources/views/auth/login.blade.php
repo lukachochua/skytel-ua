@@ -24,7 +24,7 @@
                             <span class="text-muted">or</span>
                         </div>
 
-                        <form method="POST" action="{{ route('login') }}">
+                        <form method="POST" action="{{ route('login.submit') }}">
                             @csrf
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email address</label>
