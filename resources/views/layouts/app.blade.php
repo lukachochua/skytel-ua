@@ -38,6 +38,7 @@
                         <li class="nav-item dropdown profile-dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false">
+
                                 @if (Auth::check())
                                     <img src="{{ Auth::user()->avatar }}" alt="Profile Picture">
                                 @endif

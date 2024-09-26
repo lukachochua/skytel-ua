@@ -44,16 +44,17 @@ class RegisterController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
         ]);
-
+    
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-
+    
         $avatarPath = null;
         if (isset($data['avatar'])) {
             $avatarPath = $data['avatar']->store('avatars', 'public');
+            $avatarPath = asset('storage/' . $avatarPath);
         }
-
+    
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
