@@ -13,23 +13,32 @@
                                 {{ session('success') }}
                             </div>
                         @endif
+
                         @if (Auth::check() && Auth::user()->auth_type === 'email')
-                            <form method="POST" action="{{ route('password.update') }}">
+                            <form method="POST" action="{{ route('password.change.update') }}">
                                 @csrf
-                                <!-- Change Password Form Fields -->
                                 <div class="form-group">
                                     <label for="current_password">Current Password</label>
                                     <input type="password" name="current_password" class="form-control" required>
+                                    @error('current_password')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="form-group">
                                     <label for="new_password">New Password</label>
                                     <input type="password" name="new_password" class="form-control" required>
+                                    @error('new_password')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="form-group">
                                     <label for="new_password_confirmation">Confirm New Password</label>
                                     <input type="password" name="new_password_confirmation" class="form-control" required>
+                                    @error('new_password_confirmation')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <button type="submit" class="btn btn-primary">Update Password</button>

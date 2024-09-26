@@ -68,7 +68,7 @@ class RegisterController extends Controller
 
     public function showChangePasswordForm()
     {
-        return view('auth.change_password');
+        return view('auth.passwords.change_password');
     }
 
     // Handle password change request
