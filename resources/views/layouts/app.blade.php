@@ -38,11 +38,16 @@
                         <li class="nav-item dropdown profile-dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="{{ Auth::user()->avatar }}" alt="Profile Picture">
+                                @if (Auth::check())
+                                    <img src="{{ Auth::user()->avatar }}" alt="Profile Picture">
+                                @endif
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="{{ route('profile') }}">Profile</a></li>
-                                <li><a class="dropdown-item" href="#">Settings</a></li>
+                                @if (Auth::user()->auth_type === 'email')
+                                    <li><a class="dropdown-item" href="{{ route('password.change') }}">Change Password</a>
+                                    </li>
+                                @endif
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>

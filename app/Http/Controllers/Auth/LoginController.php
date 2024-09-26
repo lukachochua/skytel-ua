@@ -61,7 +61,8 @@ class LoginController extends Controller
                     'google_id' => $googleUser->getId(),
                     'avatar' => $googleUser->getAvatar(),
                     'password' => bcrypt('google_oauth_password'),
-                    'is_info_provided' => false
+                    'is_info_provided' => false,
+                    'auth_type' => 'google'
                 ]);
                 Auth::login($newUser);
             }
@@ -78,7 +79,6 @@ class LoginController extends Controller
 
 
     // Facebook Methods
-
     public function redirectToFacebook()
     {
         return Socialite::driver('facebook')
@@ -102,7 +102,8 @@ class LoginController extends Controller
                     'facebook_id' => $facebookUser->getId(),
                     'avatar' => $facebookUser->getAvatar(),
                     'password' => bcrypt('facebook_oauth_password'),
-                    'is_info_provided' => false
+                    'is_info_provided' => false,
+                    'auth_type' => 'facebook',
                 ]);
                 Auth::login($newUser);
             }
@@ -118,7 +119,6 @@ class LoginController extends Controller
     }
 
     // Password Reset Methods
-
     public function showLinkRequestForm()
     {
         return view('auth.passwords.email');  

@@ -34,11 +34,16 @@ Route::post('/logout', function () {
 Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [RegisterController::class, 'register']);
 
-// Password Reset routes
+// Password Reset routes via e-mail
 Route::get('password/reset', [LoginController::class, 'showLinkRequestForm'])->name('password.request');
 Route::post('password/email', [LoginController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('password/reset/{token}', [LoginController::class, 'showResetForm'])->name('password.reset');
 Route::post('password/reset', [LoginController::class, 'reset'])->name('password.update');
+
+// Change Password routes
+Route::get('password/change', [RegisterController::class, 'showChangePasswordForm'])->name('password.change')->middleware('auth');
+Route::post('password/change/update', [RegisterController::class, 'changePassword'])->name('password.change.update')->middleware('auth');
+
 
 // Dashboard route
 Route::get('/dashboard', function () {

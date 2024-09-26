@@ -24,6 +24,7 @@ class User extends Authenticatable
         'avatar',
         'password',
         'is_info_provided',  
+        'auth_type'
     ];
 
     /**
