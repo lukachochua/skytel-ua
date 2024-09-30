@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserInfoController;
+use App\Http\Middleware\CheckUserInfoProvided;
 
 // Login routes
 Route::get('/', function () {
@@ -14,7 +15,6 @@ Route::get('/', function () {
 })->name('login');
 
 Route::post('/', [LoginController::class, 'login'])->name('login.submit');
-
 
 // Google authentication routes
 Route::get('auth/google', [LoginController::class, 'redirectToGoogle'])->name('google.login');
@@ -41,27 +41,21 @@ Route::get('password/reset/{token}', [LoginController::class, 'showResetForm'])-
 Route::post('password/reset', [LoginController::class, 'reset'])->name('password.update');
 
 // Change Password routes
-Route::get('password/change', [RegisterController::class, 'showChangePasswordForm'])->name('password.change')->middleware('auth');
-Route::post('password/change/update', [RegisterController::class, 'changePassword'])->name('password.change.update')->middleware('auth');
-
+Route::middleware('auth')->group(function () {
+    Route::get('password/change', [RegisterController::class, 'showChangePasswordForm'])->name('password.change');
+    Route::post('password/change/update', [RegisterController::class, 'changePassword'])->name('password.change.update');
+});
 
 // Dashboard route
 Route::get('/dashboard', function () {
-    $user = Auth::user();
-
-    if (!$user->is_info_provided) {
-        return redirect()->route('user.info.form');
-    }
-
     return view('dashboard');
-})->middleware('auth')->name('dashboard');
+})->middleware(['auth', CheckUserInfoProvided::class])->name('dashboard');
 
 // User Profile Routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', CheckUserInfoProvided::class])->group(function () {
     Route::get('/profile', [ProfileController::class, 'showProfile'])->name('profile');
     Route::put('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
 });
-
 
 // User info form route
 Route::get('/user-info', [UserInfoController::class, 'showForm'])
