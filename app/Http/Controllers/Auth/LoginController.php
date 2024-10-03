@@ -162,4 +162,26 @@ class LoginController extends Controller
             ? redirect()->route('login')->with('status', __($status))
             : back()->withErrors(['email' => [__($status)]]);
     }
+
+
+    // private function sendLoginInfoToApi(Request $request): void
+    // {
+    //     $headers = [
+    //         'X-User-IP' => $request->ip(),
+    //         'X-User-Browser' => $request->header('User-Agent'),
+    //         'X-App-'
+    //     ];
+
+    //     $response = Http::withHeaders($headers)->post('https://example-api.com/endpoint', [
+    //         'email' => Auth::user()->email,
+    //         'name' => Auth::user()->name,
+    //         'login_time' => now(),
+    //     ]);
+
+    //     if (!$response->successful()) {
+    //         Log::error('Failed to send user login info to API', [
+    //             'response' => $response->body(),
+    //         ]);
+    //     }
+    // }
 }
