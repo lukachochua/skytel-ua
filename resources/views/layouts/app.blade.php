@@ -41,7 +41,7 @@
 
     <strong>
         <a href="{{ config('app.company_url', '#') }}">
-            {{ config('app.company_name', 'My company') }}
+            {{ config('app.company_name', 'SkyTel') }}
         </a>
     </strong>
 @stop
@@ -62,12 +62,12 @@
     <style type="text/css">
         {{-- You can add AdminLTE customizations here --}}
         /*
-        .card-header {
-            border-bottom: none;
-        }
-        .card-title {
-            font-weight: 600;
-        }
-        */
+            .card-header {
+                border-bottom: none;
+            }
+            .card-title {
+                font-weight: 600;
+            }
+            */
     </style>
 @endpush
