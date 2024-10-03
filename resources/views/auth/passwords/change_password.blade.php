@@ -4,7 +4,7 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6">
-                <div class="card">
+                <div class="card mt-5">
                     <div class="card-body">
                         <h2 class="text-center mb-4">Change Password</h2>
 

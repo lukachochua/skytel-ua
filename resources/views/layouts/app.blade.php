@@ -1,79 +1,73 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('adminlte::page')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Laravel') }}</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+{{-- Extend and customize the browser title --}}
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+@section('title')
+    {{ config('adminlte.title') }}
+    @hasSection('subtitle')
+        | @yield('subtitle')
+    @endif
+@stop
 
-</head>
+{{-- Extend and customize the page content header --}}
 
-<body>
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url('/') }}">
-                SkyTel
-            </a>
+@section('content_header')
+    @hasSection('content_header_title')
+        <h1 class="text-muted">
+            @yield('content_header_title')
 
-            <button class="navbar-toggler bg-info-subtle" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            @hasSection('content_header_subtitle')
+                <small class="text-dark">
+                    <i class="fas fa-xs fa-angle-right text-muted"></i>
+                    @yield('content_header_subtitle')
+                </small>
+            @endif
+        </h1>
+    @endif
+@stop
 
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    @guest
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">Login</a>
-                        </li>
-                    @else
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a>
-                        </li>
-                        <li class="nav-item dropdown profile-dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
+{{-- Rename section content to content_body --}}
 
-                                @if (Auth::check())
-                                    <img src="{{ Auth::user()->avatar }}" alt="Profile Picture">
-                                @endif
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="{{ route('profile') }}">Profile</a></li>
-                                @if (Auth::user()->auth_type === 'email')
-                                    <li><a class="dropdown-item" href="{{ route('password.change') }}">Change Password</a>
-                                    </li>
-                                @endif
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li>
-                                    <a class="dropdown-item logout-link" href="#"
-                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                        Logout
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                @csrf
-                            </form>
-                        </li>
-                    @endguest
-                </ul>
-            </div>
-        </div>
-    </nav>
+@section('content')
+    @yield('content_body')
+@stop
 
-    <main class="container py-4">
-        @yield('content')
-    </main>
-</body>
+{{-- Create a common footer --}}
 
-</html>
+@section('footer')
+    <div class="float-right">
+        Version: {{ config('app.version', '1.0.0') }}
+    </div>
+
+    <strong>
+        <a href="{{ config('app.company_url', '#') }}">
+            {{ config('app.company_name', 'My company') }}
+        </a>
+    </strong>
+@stop
+
+{{-- Add common Javascript/Jquery code --}}
+
+@push('js')
+    <script>
+        $(document).ready(function() {
+            // Add your common script logic here...
+        });
+    </script>
+@endpush
+
+{{-- Add common CSS customizations --}}
+
+@push('css')
+    <style type="text/css">
+        {{-- You can add AdminLTE customizations here --}}
+        /*
+        .card-header {
+            border-bottom: none;
+        }
+        .card-title {
+            font-weight: 600;
+        }
+        */
+    </style>
+@endpush

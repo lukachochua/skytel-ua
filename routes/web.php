@@ -41,7 +41,7 @@ Route::get('password/reset/{token}', [LoginController::class, 'showResetForm'])-
 Route::post('password/reset', [LoginController::class, 'reset'])->name('password.update');
 
 // Change Password routes
-Route::middleware('auth')->group(function () {
+Route::middleware('auth', CheckUserInfoProvided::class)->group(function () {
     Route::get('password/change', [RegisterController::class, 'showChangePasswordForm'])->name('password.change');
     Route::post('password/change/update', [RegisterController::class, 'changePassword'])->name('password.change.update');
 });
