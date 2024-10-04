@@ -121,7 +121,6 @@ class LoginController extends Controller
                 return redirect()->route('user.info.form');
             }
         } catch (Exception $e) {
-            // Log the error message for debugging
             Log::error('Facebook login error: ' . $e->getMessage());
             return redirect('/')->with('error', 'Unable to login using Facebook. Please try again.');
         }

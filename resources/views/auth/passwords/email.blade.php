@@ -19,7 +19,10 @@
                                 <label for="email">Email Address</label>
                                 <input type="email" id="email" class="form-control" name="email" required>
                             </div>
-                            <button type="submit" class="btn btn-primary mt-3">Send Password Reset Link</button>
+                            <div class="form-group mt-3 d-flex justify-content-between">
+                                <button type="submit" class="btn btn-primary">Send Password Reset Link</button>
+                                <a href="{{ route('login') }}" class="btn btn-secondary">Back to Login</a>
+                            </div>
                         </form>
                     </div>
                 </div>

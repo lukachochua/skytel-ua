@@ -1,4 +1,4 @@
-@extends('layouts.main')
+@extends('layouts.app')
 
 @section('content')
     <div class="container">
@@ -27,8 +27,6 @@
                                 <input type="password" id="password-confirm" class="form-control"
                                     name="password_confirmation" required>
                             </div>
-
-                            <button type="submit" class="btn btn-primary mt-3">Reset Password</button>
                         </form>
                     </div>
                 </div>
