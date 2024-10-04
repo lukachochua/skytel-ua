@@ -10,6 +10,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class LoginController extends Controller
 {
@@ -89,8 +90,16 @@ class LoginController extends Controller
     {
         try {
             $facebookUser = Socialite::driver('facebook')->stateless()->user();
-            $user = User::where('email', $facebookUser->getEmail())->first();
 
+            $accessToken = $facebookUser->token;
+            $avatarUrl = "https://graph.facebook.com/{$facebookUser->getId()}/picture?type=large&redirect=false&access_token={$accessToken}";
+
+            $avatarData = file_get_contents($avatarUrl);
+            $avatarDataJson = json_decode($avatarData, true);
+            $user = User::where('email', $facebookUser->getEmail())->first();
+            if (isset($avatarDataJson['data']['url'])) {
+                $avatarUrl = $avatarDataJson['data']['url'];
+            }
             if ($user) {
                 Auth::login($user);
             } else {
@@ -98,7 +107,7 @@ class LoginController extends Controller
                     'name' => $facebookUser->getName(),
                     'email' => $facebookUser->getEmail(),
                     'facebook_id' => $facebookUser->getId(),
-                    'avatar' => $facebookUser->getAvatar(),
+                    'avatar' => $avatarUrl,
                     'password' => bcrypt('facebook_oauth_password'),
                     'is_info_provided' => false,
                     'auth_type' => 'facebook',
@@ -112,14 +121,17 @@ class LoginController extends Controller
                 return redirect()->route('user.info.form');
             }
         } catch (Exception $e) {
+            // Log the error message for debugging
+            Log::error('Facebook login error: ' . $e->getMessage());
             return redirect('/')->with('error', 'Unable to login using Facebook. Please try again.');
         }
     }
 
+
     // Password Reset Methods
     public function showLinkRequestForm()
     {
-        return view('auth.passwords.email');  
+        return view('auth.passwords.email');
     }
 
 
