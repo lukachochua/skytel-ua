@@ -13,6 +13,12 @@
                             </div>
                         @endif
 
+                        @if ($errors->any())
+                            <div class="alert alert-danger" role="alert">
+                                {{ $errors->first() }}
+                            </div>
+                        @endif
+
                         <form method="POST" action="{{ route('password.email') }}">
                             @csrf
                             <div class="form-group">

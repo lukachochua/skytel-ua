@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'User Profile')
+@section('title', 'Edit Profile')
 
 @section('content')
     <div class="container">
@@ -17,7 +17,7 @@
 
                 <div class="card card-secondary shadow-lg mt-5">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">Profile Information</h5>
+                        <h5 class="card-title mb-0">Edit Profile Information</h5>
                     </div>
 
                     <div class="card-body">
@@ -27,8 +27,8 @@
 
                             <div class="form-group">
                                 <label for="name" class="form-label">Name</label>
-                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name"
-                                    name="name" value="{{ old('name', $user->name) }}" required>
+                                <input type="text" class="form-control @error('name') is-invalid @enderror"
+                                    id="name" name="name" value="{{ old('name', $user->name) }}" required>
                                 @error('name')
                                     <span class="error invalid-feedback">{{ $message }}</span>
                                 @enderror
@@ -52,8 +52,8 @@
 
                             <div class="form-group">
                                 <label for="address" class="form-label">Address</label>
-                                <input type="text" class="form-control @error('address') is-invalid @enderror" id="address"
-                                    name="address" value="{{ old('address', $userInfo->address ?? '') }}">
+                                <input type="text" class="form-control @error('address') is-invalid @enderror"
+                                    id="address" name="address" value="{{ old('address', $userInfo->address ?? '') }}">
                                 @error('address')
                                     <span class="error invalid-feedback">{{ $message }}</span>
                                 @enderror
@@ -61,8 +61,8 @@
 
                             <div class="form-group">
                                 <label for="avatar" class="form-label">Profile Picture</label>
-                                <input type="file" class="form-control @error('avatar') is-invalid @enderror" id="avatar"
-                                    name="avatar" accept="image/*">
+                                <input type="file" class="form-control @error('avatar') is-invalid @enderror"
+                                    id="avatar" name="avatar" accept="image/*">
                                 @error('avatar')
                                     <span class="error invalid-feedback">{{ $message }}</span>
                                 @enderror

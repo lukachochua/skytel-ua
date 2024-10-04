@@ -54,6 +54,7 @@ Route::get('/dashboard', function () {
 // User Profile Routes
 Route::middleware(['auth', CheckUserInfoProvided::class])->group(function () {
     Route::get('/profile', [ProfileController::class, 'showProfile'])->name('profile');
+    Route::get('/profile/edit', [ProfileController::class, 'editProfile'])->name('profile.edit');
     Route::put('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
 });
 

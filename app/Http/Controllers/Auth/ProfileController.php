@@ -13,9 +13,16 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         $userInfo = $user->userInfo;
-        return view('profile', compact('user', 'userInfo'));
+        return view('profile.profile', compact('user', 'userInfo'));
     }
 
+
+    public function editProfile()
+    {
+        $user = Auth::user();
+        $userInfo = $user->userInfo;
+        return view('profile.edit', compact('user', 'userInfo')); 
+    }
 
     public function updateProfile(Request $request)
     {
@@ -23,15 +30,15 @@ class ProfileController extends Controller
             'name' => 'required|string|max:255',
             'phone_number' => 'required|string|max:15',
             'address' => 'nullable|string|max:255',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', 
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $user = Auth::user();
         $user->name = $request->name;
 
         if ($request->hasFile('avatar')) {
-            $path = $request->file('avatar')->store('avatars', 'public'); 
-            $user->avatar = $path; 
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $user->avatar = $path;
         }
 
         $user->save();
