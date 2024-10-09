@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Auth;
 
 class UserInfoController extends Controller
 {
-    // Show the form for collecting additional information
     public function showForm()
     {
         $user = Auth::user();
@@ -19,7 +18,6 @@ class UserInfoController extends Controller
         return view('user-info');
     }
 
-    // Handle the submission of the user info form
     public function submitForm(Request $request)
     {
         $request->validate([

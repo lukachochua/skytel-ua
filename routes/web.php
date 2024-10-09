@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApiTestController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\Auth\LoginController;
@@ -67,3 +68,7 @@ Route::get('/user-info', [UserInfoController::class, 'showForm'])
 Route::post('/user-info', [UserInfoController::class, 'submitForm'])
     ->name('user.info.submit')
     ->middleware('auth');
+
+
+// TEST API
+Route::get('/test-api', [ApiTestController::class, 'testApiConnection']);

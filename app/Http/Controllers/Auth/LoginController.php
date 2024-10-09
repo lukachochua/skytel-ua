@@ -10,7 +10,9 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class LoginController extends Controller
 {
@@ -19,6 +21,7 @@ class LoginController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
+            $this->sendRequestToApi($request);
             return redirect()->route('dashboard');
         }
 
@@ -27,23 +30,10 @@ class LoginController extends Controller
         ]);
     }
 
-
-    /**
-     * Redirect the user to the Google authentication page.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
     public function redirectToGoogle()
     {
         return Socialite::driver('google')->redirect();
     }
-
-    /**
-     * Obtain the user information from Google.
-     *
-     * @return \Illuminate\Http\Response
-     */
 
     public function handleGoogleCallback()
     {
@@ -59,25 +49,20 @@ class LoginController extends Controller
                     'email' => $googleUser->getEmail(),
                     'google_id' => $googleUser->getId(),
                     'avatar' => $googleUser->getAvatar(),
-                    'password' => bcrypt('google_oauth_password'),
+                    'password' => Hash::make('google_oauth_password'),
                     'is_info_provided' => false,
                     'auth_type' => 'google'
                 ]);
                 Auth::login($newUser);
             }
 
-            if (Auth::user()->is_info_provided) {
-                return redirect()->route('dashboard');
-            } else {
-                return redirect()->route('user.info.form');
-            }
+            return $this->redirectAfterLogin();
         } catch (Exception $e) {
+            Log::error('Google login error: ' . $e->getMessage());
             return redirect('login')->with('error', 'Unable to login using Google. Please try again.');
         }
     }
 
-
-    // Facebook Methods
     public function redirectToFacebook()
     {
         return Socialite::driver('facebook')
@@ -90,16 +75,9 @@ class LoginController extends Controller
     {
         try {
             $facebookUser = Socialite::driver('facebook')->stateless()->user();
+            $avatarUrl = $this->getFacebookAvatarUrl($facebookUser);
 
-            $accessToken = $facebookUser->token;
-            $avatarUrl = "https://graph.facebook.com/{$facebookUser->getId()}/picture?type=large&redirect=false&access_token={$accessToken}";
-
-            $avatarData = file_get_contents($avatarUrl);
-            $avatarDataJson = json_decode($avatarData, true);
             $user = User::where('email', $facebookUser->getEmail())->first();
-            if (isset($avatarDataJson['data']['url'])) {
-                $avatarUrl = $avatarDataJson['data']['url'];
-            }
             if ($user) {
                 Auth::login($user);
             } else {
@@ -108,31 +86,24 @@ class LoginController extends Controller
                     'email' => $facebookUser->getEmail(),
                     'facebook_id' => $facebookUser->getId(),
                     'avatar' => $avatarUrl,
-                    'password' => bcrypt('facebook_oauth_password'),
+                    'password' => Hash::make('facebook_oauth_password'),
                     'is_info_provided' => false,
                     'auth_type' => 'facebook',
                 ]);
                 Auth::login($newUser);
             }
 
-            if (Auth::user()->is_info_provided) {
-                return redirect()->route('dashboard');
-            } else {
-                return redirect()->route('user.info.form');
-            }
+            return $this->redirectAfterLogin();
         } catch (Exception $e) {
             Log::error('Facebook login error: ' . $e->getMessage());
             return redirect('/')->with('error', 'Unable to login using Facebook. Please try again.');
         }
     }
 
-
-    // Password Reset Methods
     public function showLinkRequestForm()
     {
         return view('auth.passwords.email');
     }
-
 
     public function sendResetLinkEmail(Request $request)
     {
@@ -144,7 +115,6 @@ class LoginController extends Controller
             ? back()->with(['status' => __($status)])
             : back()->withErrors(['email' => __($status)]);
     }
-
 
     public function showResetForm(Request $request, $token = null)
     {
@@ -174,25 +144,58 @@ class LoginController extends Controller
             : back()->withErrors(['email' => [__($status)]]);
     }
 
+    private function redirectAfterLogin()
+    {
+        return Auth::user()->is_info_provided
+            ? redirect()->route('dashboard')
+            : redirect()->route('user.info.form');
+    }
 
-    // private function sendLoginInfoToApi(Request $request): void
-    // {
-    //     $headers = [
-    //         'X-User-IP' => $request->ip(),
-    //         'X-User-Browser' => $request->header('User-Agent'),
-    //         'X-App-'
-    //     ];
+    private function getFacebookAvatarUrl($facebookUser)
+    {
+        $accessToken = $facebookUser->token;
+        $avatarUrl = "https://graph.facebook.com/{$facebookUser->getId()}/picture?type=large&redirect=false&access_token={$accessToken}";
 
-    //     $response = Http::withHeaders($headers)->post('https://example-api.com/endpoint', [
-    //         'email' => Auth::user()->email,
-    //         'name' => Auth::user()->name,
-    //         'login_time' => now(),
-    //     ]);
+        $avatarData = file_get_contents($avatarUrl);
+        $avatarDataJson = json_decode($avatarData, true);
 
-    //     if (!$response->successful()) {
-    //         Log::error('Failed to send user login info to API', [
-    //             'response' => $response->body(),
-    //         ]);
-    //     }
-    // }
+        return isset($avatarDataJson['data']['url']) ? $avatarDataJson['data']['url'] : '';
+    }
+
+    private function sendRequestToApi(Request $request): void
+    {
+        $headers = [
+            'Request-Id' => Str::uuid()->toString(),
+            'Application-Id' => '9E8E475C-94AF-4AFB-BCDA-99D578E3E674',
+            'User-Ip' => $request->ip(),
+            'User-Agent' => $request->header('User-Agent'),
+        ];
+
+        $data = [
+            'email' => $request->email,
+            'password' => $request->password, 
+            'timestamp' => now(),
+        ];
+
+        try {
+            $response = Http::withHeaders($headers)
+                ->post('http://198.18.22.87:8082/Home/Test', $data);
+
+            if (!$response->successful()) {
+                Log::error('Failed to send request to API', [
+                    'status' => $response->status(),
+                    'response' => $response->body(),
+                ]);
+            } else {
+                Log::info('Successfully sent request to API', [
+                    'status' => $response->status(),
+                    'response' => $response->body(),
+                ]);
+            }
+        } catch (Exception $e) {
+            Log::error('Exception occurred while sending request to API', [
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
 }
