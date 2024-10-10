@@ -33,7 +33,7 @@ class ApiTestController extends Controller
     {
         $headers = [
             'Request-Id' => Str::uuid()->toString(),
-            'Application-Id' => '9E8E475C-94AF-4AFB-BCDA-99D578E3E674',
+            'Application-Id' => env('APP_ID'),
             'User-Ip' => $request->ip(),
             'User-Agent' => $request->header('User-Agent'),
         ];
