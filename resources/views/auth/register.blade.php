@@ -10,18 +10,6 @@
 
                         <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
                             @csrf
-
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Name</label>
-                                <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                    id="name" name="name" value="{{ old('name') }}" required autofocus>
-                                @error('name')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email address</label>
                                 <input type="email" class="form-control @error('email') is-invalid @enderror"
@@ -63,6 +51,7 @@
 
                             <button type="submit" class="btn btn-primary btn-block">Register</button>
                         </form>
+
 
                         <div class="text-center mt-3">
                             <a href="{{ route('login') }}" class="text-muted">Already have an account? Login</a>

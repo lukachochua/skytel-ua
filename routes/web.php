@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\ApiTestController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
@@ -31,9 +32,8 @@ Route::post('/logout', function () {
     return redirect()->route('login');
 })->name('logout');
 
-// Register routes
-Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('register', [RegisterController::class, 'register']);
+
+// Route::post('register', [RegisterController::class, 'register']);
 
 // Password Reset routes via e-mail
 Route::get('password/reset', [LoginController::class, 'showLinkRequestForm'])->name('password.request');
@@ -72,3 +72,7 @@ Route::post('/user-info', [UserInfoController::class, 'submitForm'])
 
 // TEST API
 Route::get('/test-api', [ApiTestController::class, 'testApiConnection']);
+
+// Register routes
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::get('register/{provider}', [UserController::class, 'register'])->name('register.provider');

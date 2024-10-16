@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Log;
 
 class CheckUserInfoProvided
 {
@@ -22,8 +22,8 @@ class CheckUserInfoProvided
         }
 
         $user = Auth::user();
-
-        if ($user && !$user->is_info_provided) {
+        Log::info('User state in middleware:', ['user' => $user]);
+        if (!$user || !$user->is_info_provided) {
             return redirect()->route('user.info.form');
         }
 

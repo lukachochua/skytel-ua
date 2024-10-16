@@ -39,6 +39,8 @@ class LoginController extends Controller
     {
         try {
             $googleUser = Socialite::driver('google')->stateless()->user();
+            Log::info('Google user retrieved', ['user' => $googleUser]);
+
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if ($user) {
@@ -54,6 +56,8 @@ class LoginController extends Controller
                     'auth_type' => 'google'
                 ]);
                 Auth::login($newUser);
+                Log::info('User authenticated', ['user' => $newUser, 'is_authenticated' => Auth::check()]);
+                Log::info('Session data', ['session' => session()->all()]);
             }
 
             return $this->redirectAfterLogin();
@@ -146,6 +150,11 @@ class LoginController extends Controller
 
     private function redirectAfterLogin()
     {
+        session(['login_success' => true]);
+
+
+        Log::info('Session data after login', session()->all());
+
         return Auth::user()->is_info_provided
             ? redirect()->route('dashboard')
             : redirect()->route('user.info.form');
@@ -173,7 +182,7 @@ class LoginController extends Controller
 
         $data = [
             'email' => $request->email,
-            'password' => $request->password, 
+            'password' => $request->password,
             'timestamp' => now(),
         ];
 
