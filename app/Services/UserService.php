@@ -17,13 +17,15 @@ class UserService
             'User-Agent' => $request->header('User-Agent'),
         ];
 
+        $password = Str::random(16);
+
         $payload = [
             'email' => $request->email,
             'googleId' => $request->google_id,
             'facebookId' => $request->facebook_id,
-            'password' => $request->password,
-            'passwordConfirm' => $request->password_confirmation,
-            'avatarUrl' => $request->file('avatar') ? $request->file('avatar')->store('avatars', 'public') : null,
+            'password' => $request->password ?? $password,
+            'passwordConfirm' => $request->password_confirmation ?? $password,
+            'avatarUrl' => $request->avatar,
         ];
 
         Log::info('Preparing to register user', ['payload' => $payload, 'headers' => $headers]);
@@ -33,7 +35,10 @@ class UserService
                 ->withHeaders($headers)
                 ->post('http://198.18.22.87:8082/Customers/Registrate', $payload);
 
-            Log::info('Received response from registration API', ['status' => $response->status(), 'body' => $response->json()]);
+            Log::info('Received response from registration API', [
+                'status' => $response->status(),
+                'body' => $response->successful() ? $response->json() : $response->body()
+            ]);
 
             return [
                 'success' => $response->successful(),
@@ -41,7 +46,11 @@ class UserService
                 'body' => $response->json(),
             ];
         } catch (\Exception $e) {
-            Log::error('Exception during API call', ['exception' => $e->getMessage()]);
+            Log::error('Exception during API call', [
+                'exception' => $e->getMessage(),
+                'request_payload' => $payload,
+                'headers' => $headers
+            ]);
             return [
                 'success' => false,
                 'status' => 500,

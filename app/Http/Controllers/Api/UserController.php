@@ -7,6 +7,7 @@ use App\Http\Requests\CreateUserRequest;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Laravel\Socialite\Facades\Socialite;
 
 class UserController extends Controller
 {
@@ -46,5 +47,62 @@ class UserController extends Controller
                 'details' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function redirectToProvider($provider)
+    {
+        return Socialite::driver($provider)->stateless()->redirect();
+    }
+
+    public function handleProviderCallback($provider)
+    {
+        try {
+            $socialUser = Socialite::driver($provider)->stateless()->user();
+
+            // Create a new Request instance with the social data
+            $request = new \Illuminate\Http\Request([
+                'email' => $socialUser->getEmail(),
+                'avatar' => $socialUser->getAvatar(),
+                $provider . '_id' => $socialUser->getId(),
+                'password' => null,  // Default values handled in UserService
+                'password_confirmation' => null,
+            ]);
+
+            // Manually extract the User IP and User Agent from the current request
+            $request->headers->set('User-Ip', $this->getUserIp());
+            $request->headers->set('User-Agent', $this->getUserAgent());
+
+            Log::info('Handling registration with social provider', ['provider' => $provider, 'user' => $socialUser]);
+
+            $result = $this->userService->registerUser($request);
+
+            if ($result['success']) {
+                return response()->json([
+                    'message' => 'User successfully registered via ' . ucfirst($provider) . '!',
+                    'data' => $result['body']
+                ], $result['status']);
+            }
+
+            return response()->json([
+                'error' => 'Registration via ' . ucfirst($provider) . ' failed!',
+                'details' => $result['body']
+            ], $result['status']);
+        } catch (\Exception $e) {
+            Log::error('Exception during social registration', ['exception' => $e->getMessage()]);
+            return response()->json([
+                'error' => 'Registration via ' . ucfirst($provider) . ' failed due to an exception!',
+                'details' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    protected function getUserIp()
+    {
+        return request()->getClientIp();  
+    }
+
+    protected function getUserAgent()
+    {
+        return request()->header('User-Agent');  
     }
 }

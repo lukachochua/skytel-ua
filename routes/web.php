@@ -19,12 +19,12 @@ Route::get('/', function () {
 Route::post('/', [LoginController::class, 'login'])->name('login.submit');
 
 // Google authentication routes
-Route::get('auth/google', [LoginController::class, 'redirectToGoogle'])->name('google.login');
-Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback']);
+// Route::get('auth/google', [LoginController::class, 'redirectToGoogle'])->name('google.login');
+// Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback']);
 
 // Facebook authentication routes
-Route::get('auth/facebook', [LoginController::class, 'redirectToFacebook'])->name('facebook.login');
-Route::get('auth/facebook/callback', [LoginController::class, 'handleFacebookCallback']);
+// Route::get('auth/facebook', [LoginController::class, 'redirectToFacebook'])->name('facebook.login');
+// Route::get('auth/facebook/callback', [LoginController::class, 'handleFacebookCallback']);
 
 // Logout route
 Route::post('/logout', function () {
@@ -75,4 +75,12 @@ Route::get('/test-api', [ApiTestController::class, 'testApiConnection']);
 
 // Register routes
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::get('register/{provider}', [UserController::class, 'register'])->name('register.provider');
+Route::post('/register', [UserController::class, 'register']);
+
+
+Route::get('/auth/{provider}', [UserController::class, 'redirectToProvider'])->name('social.register');
+Route::get('/auth/{provider}/callback', [UserController::class, 'handleProviderCallback']);
+
+
+
+

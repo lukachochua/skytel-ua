@@ -52,6 +52,17 @@
                             <button type="submit" class="btn btn-primary btn-block">Register</button>
                         </form>
 
+                        <div class="mt-4">
+                            <p class="text-center">Or register with:</p>
+                            <div class="d-flex justify-content-center">
+                                <a href="{{ route('social.register', 'google') }}" class="btn btn-outline-danger me-2">
+                                    <i class="fab fa-google"></i> Google
+                                </a>
+                                <a href="{{ route('social.register', 'facebook') }}" class="btn btn-outline-primary">
+                                    <i class="fab fa-facebook-f"></i> Facebook
+                                </a>
+                            </div>
+                        </div>
 
                         <div class="text-center mt-3">
                             <a href="{{ route('login') }}" class="text-muted">Already have an account? Login</a>
