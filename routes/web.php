@@ -74,12 +74,10 @@ Route::post('/user-info', [UserInfoController::class, 'submitForm'])
 Route::get('/test-api', [ApiTestController::class, 'testApiConnection']);
 
 // Register routes
-Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('/register', [UserController::class, 'register']);
-
-
-Route::get('/auth/{provider}', [UserController::class, 'redirectToProvider'])->name('social.register');
-Route::get('/auth/{provider}/callback', [UserController::class, 'handleProviderCallback']);
+Route::middleware('throttle:10,1')->get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::middleware('throttle:5,1')->post('/register', [UserController::class, 'register']);
+Route::middleware('throttle:10,1')->get('/auth/{provider}', [UserController::class, 'redirectToProvider'])->name('social.register');
+Route::middleware('throttle:10,1')->get('/auth/{provider}/callback', [UserController::class, 'handleProviderCallback']);
 
 
 

@@ -175,7 +175,7 @@ class LoginController extends Controller
     {
         $headers = [
             'Request-Id' => Str::uuid()->toString(),
-            'Application-Id' => '9E8E475C-94AF-4AFB-BCDA-99D578E3E674',
+            'Application-Id' => '5CAEC5D7-A97C-464B-8863-0F182902702E',
             'User-Ip' => $request->ip(),
             'User-Agent' => $request->header('User-Agent'),
         ];
