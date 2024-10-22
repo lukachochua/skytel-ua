@@ -15,8 +15,8 @@ class CreateUserRequest extends FormRequest
     {
         return [
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
-            'password_confirmation' => ['nullable', 'string', 'min:8'],
+            'password' => ['nullable', 'string', 'min:8', 'max:32', 'confirmed'],
+            'password_confirmation' => ['nullable', 'string', 'min:8', 'max:32',],
             'avatar' => ['nullable', 'string'],
             'google_id' => ['nullable', 'string'],
             'facebook_id' => ['nullable', 'string'],

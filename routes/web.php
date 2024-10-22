@@ -10,26 +10,24 @@ use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserInfoController;
 use App\Http\Middleware\CheckUserInfoProvided;
+use Illuminate\Support\Facades\Log;
 
-// Login routes
-Route::get('/', function () {
-    return Auth::check() ? redirect()->route('dashboard') : view('auth.login');
-})->name('login');
-
-Route::post('/', [LoginController::class, 'login'])->name('login.submit');
+// Route::post('/', [LoginController::class, 'login'])->name('login.submit');
 
 // Google authentication routes
-// Route::get('auth/google', [LoginController::class, 'redirectToGoogle'])->name('google.login');
-// Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback']);
+Route::get('auth/google', [LoginController::class, 'redirectToGoogle'])->name('google.login');
+Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback']);
 
 // Facebook authentication routes
-// Route::get('auth/facebook', [LoginController::class, 'redirectToFacebook'])->name('facebook.login');
-// Route::get('auth/facebook/callback', [LoginController::class, 'handleFacebookCallback']);
+Route::get('auth/facebook', [LoginController::class, 'redirectToFacebook'])->name('facebook.login');
+Route::get('auth/facebook/callback', [LoginController::class, 'handleFacebookCallback']);
 
 // Logout route
 Route::post('/logout', function () {
     Auth::logout();
-    return redirect()->route('login');
+    return redirect()->route('login')
+        ->withCookie(cookie()->forget('accessToken'))
+        ->withCookie(cookie()->forget('refreshToken'));
 })->name('logout');
 
 
@@ -50,7 +48,7 @@ Route::middleware('auth', CheckUserInfoProvided::class)->group(function () {
 // Dashboard route
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', CheckUserInfoProvided::class])->name('dashboard');
+})->middleware(['token.auth'])->name('dashboard');
 
 // User Profile Routes
 Route::middleware(['auth', CheckUserInfoProvided::class])->group(function () {
@@ -60,9 +58,9 @@ Route::middleware(['auth', CheckUserInfoProvided::class])->group(function () {
 });
 
 // User info form route
-Route::get('/user-info', [UserInfoController::class, 'showForm'])
-    ->name('user.info.form')
-    ->middleware('auth');
+// Route::get('/user-info', [UserInfoController::class, 'showForm'])
+//     ->name('user.info.form')
+//     ->middleware('auth');
 
 // Submit user info form route
 Route::post('/user-info', [UserInfoController::class, 'submitForm'])
@@ -74,11 +72,24 @@ Route::post('/user-info', [UserInfoController::class, 'submitForm'])
 Route::get('/test-api', [ApiTestController::class, 'testApiConnection']);
 
 // Register routes
-Route::middleware('throttle:10,1')->get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::middleware('throttle:5,1')->post('/register', [UserController::class, 'register']);
-Route::middleware('throttle:10,1')->get('/auth/{provider}', [UserController::class, 'redirectToProvider'])->name('social.register');
-Route::middleware('throttle:10,1')->get('/auth/{provider}/callback', [UserController::class, 'handleProviderCallback']);
+Route::middleware('throttle:3,1')->get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::middleware('throttle:3,1')->post('/register', [UserController::class, 'register']);
+Route::middleware('throttle:3,1')->get('/auth/{provider}', [UserController::class, 'redirectToProvider'])->name('social.register');
+Route::middleware('throttle:3,1')->get('/auth/{provider}/callback', [UserController::class, 'handleProviderCallback']);
 
 
+// Login routes
+Route::get('/', function () {
+    $accessToken = request()->cookie('accessToken');
+    Log::info('Access Token: ' . ($accessToken ?? 'None'));
 
+    if ($accessToken) {
+        Log::info('Redirecting to dashboard');
+        return redirect()->route('dashboard');
+    }
 
+    Log::info('Displaying login view');
+    return view('auth.login');
+})->name('login');
+
+Route::middleware('throttle:5,1')->post('/login', [UserController::class, 'login'])->name('login.submit');

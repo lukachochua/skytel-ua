@@ -14,7 +14,7 @@
                         @endif
 
                         <div class="card card-primary shadow-lg mt-3 bg-secondary">
-                            <h2 class="text-center">Welcome to your dashboard, {{ Auth::user()->name }}</h2>
+                            {{-- <h2 class="text-center">Welcome to your dashboard, {{ Auth::user()->name }}</h2> --}}
                         </div>
                     </div>
                 </div>

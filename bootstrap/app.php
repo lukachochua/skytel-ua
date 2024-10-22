@@ -4,7 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\CheckUserInfoProvided;
-
+use App\Http\Middleware\TokenAuthMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,6 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [
             \Illuminate\Session\Middleware\StartSession::class,
+        ]);
+
+        $middleware->alias([
+            'token.auth' => TokenAuthMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -4,10 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateUserRequest;
+use App\Http\Requests\LoginRequest;
 use App\Services\UserService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Cookie;
+
 
 class UserController extends Controller
 {
@@ -98,11 +102,71 @@ class UserController extends Controller
 
     protected function getUserIp()
     {
-        return request()->getClientIp();  
+        return request()->getClientIp();
     }
 
     protected function getUserAgent()
     {
-        return request()->header('User-Agent');  
+        return request()->header('User-Agent');
+    }
+
+    /**
+     * Handle user login.
+     *
+     * @param LoginRequest $request
+     * @return JsonResponse
+     */
+    public function login(LoginRequest $request)
+    {
+        Log::info('Login User Request', ['data' => $request->all()]);
+
+        try {
+            Log::info('Calling UserService to log in user');
+            $result = $this->userService->loginUser($request);
+
+            if ($result['success']) {
+                Log::info('UserService login success', ['response' => $result]);
+
+                // Extract the token and other necessary data
+                $accessToken = $result['body']['data']['accessToken'];
+                $refreshToken = $result['body']['data']['refreshToken'];
+
+                // Convert the accessTokenExpirationTime to numeric format
+                $expirationTime = Carbon::parse($result['body']['data']['accessTokenExpirationTime']);
+                $tokenExpirationInMinutes = Carbon::now()->diffInMinutes($expirationTime);
+
+                // Set tokens in secure, HTTP-only cookies (valid for tokenExpirationInMinutes)
+                Cookie::queue(Cookie::make('accessToken', $accessToken, $tokenExpirationInMinutes, null, null, true, true, false, 'Strict'));
+                Cookie::queue(Cookie::make('refreshToken', $refreshToken, $tokenExpirationInMinutes, null, null, true, true, false, 'Strict'));
+
+                // Redirect the user to the dashboard
+                return redirect()->route('dashboard');
+            }
+
+            // Log the failed response
+            Log::error('UserService login failed', [
+                'response' => $result,
+                'status' => $result['status'],
+                'details' => $result['body'],
+            ]);
+
+            // Redirect back with error status
+            return redirect()->back()->withErrors([
+                'error' => 'Login failed!',
+                'status' => $result['status'],
+                'details' => $result['body'],
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Exception occurred during login', [
+                'exception' => $e->getMessage(),
+                'status' => 500
+            ]);
+
+            return redirect()->back()->withErrors([
+                'error' => 'Login failed due to an exception!',
+                'details' => $e->getMessage(),
+                'status' => 500,
+            ]);
+        }
     }
 }
