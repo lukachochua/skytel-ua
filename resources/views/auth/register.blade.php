@@ -7,7 +7,6 @@
                 <div class="card">
                     <div class="card-body">
                         <h2 class="card-title text-center mb-4">Register</h2>
-
                         <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
                             @csrf
                             <div class="mb-3">

@@ -7,20 +7,22 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\SocialAuthController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserInfoController;
 use App\Http\Middleware\CheckUserInfoProvided;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 // Route::post('/', [LoginController::class, 'login'])->name('login.submit');
 
-// Google authentication routes
-Route::get('auth/google', [LoginController::class, 'redirectToGoogle'])->name('google.login');
-Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback']);
+// // Google authentication routes
+// Route::get('auth/google', [LoginController::class, 'redirectToGoogle'])->name('google.login');
+// Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback']);
 
-// Facebook authentication routes
-Route::get('auth/facebook', [LoginController::class, 'redirectToFacebook'])->name('facebook.login');
-Route::get('auth/facebook/callback', [LoginController::class, 'handleFacebookCallback']);
+// // Facebook authentication routes
+// Route::get('auth/facebook', [LoginController::class, 'redirectToFacebook'])->name('facebook.login');
+// Route::get('auth/facebook/callback', [LoginController::class, 'handleFacebookCallback']);
 
 // Logout route
 Route::post('/logout', function () {
@@ -45,10 +47,6 @@ Route::middleware('auth', CheckUserInfoProvided::class)->group(function () {
     Route::post('password/change/update', [RegisterController::class, 'changePassword'])->name('password.change.update');
 });
 
-// Dashboard route
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['token.auth'])->name('dashboard');
 
 // User Profile Routes
 Route::middleware(['auth', CheckUserInfoProvided::class])->group(function () {
@@ -58,9 +56,9 @@ Route::middleware(['auth', CheckUserInfoProvided::class])->group(function () {
 });
 
 // User info form route
-// Route::get('/user-info', [UserInfoController::class, 'showForm'])
-//     ->name('user.info.form')
-//     ->middleware('auth');
+Route::get('/user-info', [UserInfoController::class, 'showForm'])
+    ->name('user.info.form')
+    ->middleware('auth');
 
 // Submit user info form route
 Route::post('/user-info', [UserInfoController::class, 'submitForm'])
@@ -71,24 +69,34 @@ Route::post('/user-info', [UserInfoController::class, 'submitForm'])
 // TEST API
 Route::get('/test-api', [ApiTestController::class, 'testApiConnection']);
 
+
+// Dashboard route
+Route::get('/dashboard', function (Request $request) {
+    Log::info('Dashboard route accessed', [
+        'cookies' => $request->cookies->all(),
+        'headers' => $request->headers->all()
+    ]);
+    return view('dashboard');
+})->middleware(['token.auth'])->name('dashboard');
+
 // Register routes
-Route::middleware('throttle:3,1')->get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::middleware('throttle:3,1')->post('/register', [UserController::class, 'register']);
-Route::middleware('throttle:3,1')->get('/auth/{provider}', [UserController::class, 'redirectToProvider'])->name('social.register');
-Route::middleware('throttle:3,1')->get('/auth/{provider}/callback', [UserController::class, 'handleProviderCallback']);
+// Social login routes
+Route::middleware('api')->group(function () {
+    Route::get('auth/{provider}', [UserController::class, 'redirectToProvider'])->name('social.register');
+    Route::get('auth/{provider}/callback', [UserController::class, 'handleProviderCallback'])->name('social.callback');
+});
+
+// Route::middleware('api')->group(function () {
+//     Route::get('auth/{provider}', [SocialAuthController::class, 'redirectToProvider'])->name('social.register');
+//     Route::get('auth/{provider}/callback', [SocialAuthController::class, 'handleProviderCallback'])->name('social.callback');
+// });
+
 
 
 // Login routes
 Route::get('/', function () {
-    $accessToken = request()->cookie('accessToken');
-    Log::info('Access Token: ' . ($accessToken ?? 'None'));
-
-    if ($accessToken) {
-        Log::info('Redirecting to dashboard');
-        return redirect()->route('dashboard');
-    }
-
-    Log::info('Displaying login view');
     return view('auth.login');
 })->name('login');
 

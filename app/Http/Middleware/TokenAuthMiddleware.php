@@ -17,6 +17,8 @@ class TokenAuthMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
+        Log::info('All cookies:', [$request->cookies->all()]);
+
         try {
             $token = $request->cookie('accessToken');
 

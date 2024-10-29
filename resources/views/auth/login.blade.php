@@ -9,7 +9,7 @@
                         <h2 class="card-title text-center mb-4">Login</h2>
 
                         <!-- Social login buttons -->
-                        <div class="d-flex justify-content-between mb-3">
+                        {{-- <div class="d-flex justify-content-between mb-3">
                             <a href="{{ route('google.login') }}"
                                 class="btn btn-danger w-100 d-flex align-items-center justify-content-center me-2">
                                 <i class="fab fa-google me-2"></i> Login with Google
@@ -19,7 +19,7 @@
                                 class="btn btn-primary w-100 d-flex align-items-center justify-content-center">
                                 <i class="fab fa-facebook me-2"></i> Login with Facebook
                             </a>
-                        </div>
+                        </div> --}}
 
                         <div class="text-center mb-3">
                             <span class="text-muted">or</span>

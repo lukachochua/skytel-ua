@@ -8,6 +8,7 @@ use App\Http\Requests\LoginRequest;
 use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Cookie;
@@ -55,50 +56,75 @@ class UserController extends Controller
 
     public function redirectToProvider($provider)
     {
+        Log::info('Before redirect to Google:', [request()->cookies->all()]);
+
         return Socialite::driver($provider)->stateless()->redirect();
     }
 
     public function handleProviderCallback($provider)
     {
+        Log::info('After redirect from Google:', [request()->cookies->all()]);
+
         try {
+            // Retrieve user info from the provider
             $socialUser = Socialite::driver($provider)->stateless()->user();
 
-            // Create a new Request instance with the social data
-            $request = new \Illuminate\Http\Request([
-                'email' => $socialUser->getEmail(),
-                'avatar' => $socialUser->getAvatar(),
-                $provider . '_id' => $socialUser->getId(),
-                'password' => null,  // Default values handled in UserService
-                'password_confirmation' => null,
+            // Log the social user details
+            Log::info('Social user information', [
+                'provider' => $provider,
+                'socialUser' => [
+                    'email' => $socialUser->getEmail(),
+                    'name' => $socialUser->getName(),
+                    'google_id' => $provider === 'google' ? $socialUser->getId() : null,
+                    'facebook_id' => $provider === 'facebook' ? $socialUser->getId() : null,
+                    'avatar' => $socialUser->getAvatar(),
+                    'access_token' => $socialUser->token,
+                    'refresh_token' => $socialUser->refreshToken,
+                ],
             ]);
 
-            // Manually extract the User IP and User Agent from the current request
-            $request->headers->set('User-Ip', $this->getUserIp());
-            $request->headers->set('User-Agent', $this->getUserAgent());
+            // Prepare data for login or registration
+            $request = new Request([
+                'email' => $socialUser->getEmail(),
+                'name' => $socialUser->getName(),
+                'google_id' => $provider === 'google' ? $socialUser->getId() : null,
+                'facebook_id' => $provider === 'facebook' ? $socialUser->getId() : null,
+                'avatar' => $socialUser->getAvatar(),
+                'access_token' => $socialUser->token,
+                'refresh_token' => $socialUser->refreshToken,
+            ]);
 
-            Log::info('Handling registration with social provider', ['provider' => $provider, 'user' => $socialUser]);
+            // Delegate to UserService for login or registration
+            $result = $this->userService->loginOrRegisterUser($request);
 
-            $result = $this->userService->registerUser($request);
+            // Log the result for debugging
+            Log::info('Result from UserService', ['result' => $result]);
 
-            if ($result['success']) {
+            // Handle failed authentication more specifically
+            if (!$result['success']) {
                 return response()->json([
-                    'message' => 'User successfully registered via ' . ucfirst($provider) . '!',
-                    'data' => $result['body']
-                ], $result['status']);
+                    'error' => $result['body']['error'] ?? 'Authentication failed.',
+                    'details' => $result['body'] ?? 'An unknown error occurred',
+                ], 401);
             }
 
-            return response()->json([
-                'error' => 'Registration via ' . ucfirst($provider) . ' failed!',
-                'details' => $result['body']
-            ], $result['status']);
+            Log::info('Access token set in cookies', ['access_token' => $result['body']['data']['accessToken']]);
+            Log::info('Refresh token set in cookies', ['refresh_token' => $result['body']['data']['refreshToken']]);
+
+            // Set tokens in cookies
+            return redirect()->route('dashboard')
+                ->withCookie(cookie('access_token', $result['body']['data']['accessToken'], 60))
+                ->withCookie(cookie('refresh_token', $result['body']['data']['refreshToken'], 60 * 24));
         } catch (\Exception $e) {
-            Log::error('Exception during social registration', ['exception' => $e->getMessage()]);
+            Log::error('Social login error', ['exception' => $e->getMessage()]);
+
             return response()->json([
-                'error' => 'Registration via ' . ucfirst($provider) . ' failed due to an exception!',
-                'details' => $e->getMessage()
+                'error' => 'Could not authenticate using ' . $provider,
+                'details' => $e->getMessage(),
             ], 500);
         }
     }
+
 
     protected function getUserIp()
     {
